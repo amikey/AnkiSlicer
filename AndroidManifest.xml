@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.knziha.ankislicer">
+    
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="24" />
+    
+    <uses-permission android:name="com.ichi2.anki.permission.READ_WRITE_DATABASE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <application
+        android:name="com.knziha.ankislicer.ui.MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_lc_new"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="true"
+        >
+        <activity
+            android:name="com.knziha.ankislicer.ui.PopupActivity"
+            android:label=" Anki 划 书 "
+            android:theme="@style/Theme.popTheme"
+            android:windowSoftInputMode="adjustPan"
+            android:taskAffinity=""
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true"
+            android:process=":PopupActivity"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>  
+                <action android:name="android.intent.action.MAIN" />  
+                <action android:name="android.intent.action.SEND" />  
+                <category android:name="android.intent.category.DEFAULT" />  
+                <data android:mimeType="image/*" />  
+                <category android:name="android.intent.category.LAUNCHER" />  
+            </intent-filter>  
+            
+            <intent-filter>
+                <action android:name="colordict.intent.action.SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.mmjang.ankihelper.plan.ui.PlansManagerActivity"
+            android:label="@string/title_activity_plans_manager"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.mmjang.ankihelper.plan.ui.PlanEditorActivity"
+            android:label="@string/title_activity_plan_editor"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <service
+            android:name="com.mmjang.ankihelper.domain.CBWatcherService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":CBService" />
+
+        <activity 
+            android:name="com.knziha.ankislicer.ui.MainActivity"
+            android:theme="@style/AppTheme.apptheme"
+            android:configChanges="keyboardHidden"
+			android:windowSoftInputMode="adjustPan|stateHidden|stateUnchanged"
+			android:hardwareAccelerated="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.knziha.ankislicer.ui.AboutActivity" />
+        <activity android:name="com.knziha.ankislicer.ui.CustomDictionaryActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/btn_open_custom_dicitonary_str"
+            >
+
+        </activity>
+
+	<activity android:name="com.mmjang.ankihelper.plan.ui.dict_manager_activity" android:theme="@style/AppTheme" >
+            
+        </activity>
+        
+    </application>
+
+</manifest>

@@ -1,0 +1,30 @@
+<resources>
+	<string-array name="share_pre_empt"> 
+		    <item name="shan">删除文本</item>
+		    <item name="to1">誊至正面新卡</item>
+		    <item name="to2">誊至背面新卡</item>
+		    <item name="expand_share">↓↓↓展开</item>
+	</string-array> 
+	
+    <string-array name="selection_tweak"> 
+		<item>全选</item>
+		<item>全不选</item>
+	</string-array>
+	
+    <string-array name="choosed_tweak"> 
+		<item>浏览全部牌组</item>
+		<item>刷新当前牌组</item>
+	</string-array>
+	
+    
+   <string-array name="bookmark0_tweak"> 
+		<item>更新书签位置</item>
+		<item>跳转到书签</item>
+	</string-array>
+	
+    <string-array name="ver_tweak"> 
+		<item>严格模式</item>
+		<item>宽松模式</item>
+	</string-array>
+	
+</resources>

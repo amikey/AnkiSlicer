@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:background="@drawable/listviewselector1">
+	
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:text="happy"
+		android:id="@+id/text"
+		android:layout_marginLeft="10dp"
+		android:layout_marginTop="5dp"
+		android:layout_marginBottom="5dp"	
+		android:textSize="24dp"
+		android:textColor="#000"
+		/>
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:text="牛津高阶双语词典"
+		android:id="@+id/subtext"
+		android:layout_marginLeft="10dp"
+		android:layout_marginTop="5dp"
+		android:paddingBottom ="5dp"	
+		android:textSize="10dp"
+		android:textColor="#aaa"
+		android:layout_below="@+id/text"
+		/>
+	
+
+</RelativeLayout>
+

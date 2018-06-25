@@ -1,0 +1,47 @@
+<resources>
+    <string-array name="share_pre_empt"> 
+	    <item name="shan">Delete Text</item>
+	    <item name="to1">Send to Front extra</item>
+	    <item name="to2">Send to Back extra </item>
+	    <item name="expand_share">↓↓↓Unfold</item>
+    </string-array> 
+    
+    
+    <string-array name="mnstyle"> 
+	    <item >Clikable Cloze</item>
+	    <item >背景高亮</item>
+	    <item >加粗 </item>
+	    <item >前景色</item>
+	    <item >下划线</item>
+    </string-array> 
+    
+    <string-array name="mnstyle_"> 
+	    <item >1</item>
+	    <item >2</item>
+	    <item >3 </item>
+	    <item >4</item>
+	    <item >5</item>
+    </string-array>
+    
+    <string-array name="selection_tweak"> 
+		<item>Select All</item>
+		<item>Cancel Selection</item>
+	</string-array>
+	
+    <string-array name="choosed_tweak"> 
+		<item>Browse All Decks</item>
+		<item>Refresh Current Deck</item>
+	</string-array>
+	
+    <string-array name="bookmark0_tweak"> 
+		<item>Update bookmark</item>
+		<item>Jump</item>
+	</string-array>
+	
+    <string-array name="ver_tweak"> 
+		<item>Strict Mode</item>
+		<item>Loose Mode</item>
+	</string-array>
+	
+    
+</resources>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:ripplele="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+<com.andexert.library.RippleView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    ripplele:mrl_rippleDelayClick="false"
+    >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+                <TextView
+                    android:id="@+id/btn_open_plan_manager"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/plan_manager_str"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+
+
+            <View style="@style/Divider" />
+
+                <TextView
+                    android:id="@+id/btn_add_default_plan"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/btn_add_default_plan_str"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+            <View style="@style/Divider" />
+
+
+                <Switch
+                    android:duplicateParentState="false"
+                    android:id="@+id/switch_monite_clipboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/monite_clipboard"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+            <View style="@style/Divider" />
+
+
+                <Switch
+                    android:duplicateParentState="false"
+                    android:id="@+id/switch_cancel_after_add"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/cancel_after_add"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+
+     
+
+                <TextView
+                    android:id="@+id/btn_help"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/btn_help_str"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+            <View style="@style/Divider" />
+                <TextView
+                    android:id="@+id/btn_about_and_support"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/btn_about_and_support_str"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+     
+
+
+                <TextView
+                    android:id="@+id/btn_open_custom_dictionary"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/btn_open_custom_dicitonary_str"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+
+
+
+        </LinearLayout>
+</com.andexert.library.RippleView>
+        
+</LinearLayout>

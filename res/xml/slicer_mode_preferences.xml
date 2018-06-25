@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+       
+        
+        
+
+        
+         <com.mmjang.ankihelper.programData.PlanChooserPreference 
+              android:key="last_selected_plan"
+	          android:title="选择划书方案" 
+	          android:summary="当前方案: "/>
+        
+         
+
+         <MultiSelectListPreference 
+	            android:key="mainNoteStyle" 
+		        android:title="选择主笔记样式" 
+		        android:summary="卷轴内主笔记的输出形式 " 
+		        android:entries="@array/mnstyle" 
+		        android:entryValues="@array/mnstyle_" 
+		        android:dialogTitle  ="选择主笔记样式"/> 
+        
+              
+         <com.mmjang.ankihelper.programData.DeckChooserPreference   
+            android:persistent="false"
+            android:key="choose_deck"
+            android:title="选择牌组"
+            android:summary="目标牌组: "/>   
+            
+</PreferenceScreen>

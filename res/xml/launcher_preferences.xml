@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <!-- 设置的类别 -->
+    <PreferenceCategory 
+        android:key="mylocation"
+        android:summary="我的位置"
+        android:title="Anki划书-基本设置">              
+        
+        
+        <Preference   
+            android:key="btn_open_plan_manager"
+            android:summary="修改划书方案并进行排序"
+            android:title="@string/plan_manager_str"/>   
+        
+         <Preference
+              android:key="btn_add_default_plan"
+	            android:summary="添加默认方案"
+	            android:title="@string/btn_add_default_plan_str" />
+        
+         
+          <Preference
+                    android:key="btn_help"
+			            android:summary="前往教程"
+			            android:title="@string/btn_help_str"/>
+         
+                   <Preference
+                   android:key="btn_about_and_support"
+			            android:summary="启动浮动面板"
+			            android:title="测试" />
+         
+         
+        <SwitchPreference 
+            android:key="switch_monite_clipboard"
+            android:summary=""
+            android:title="@string/monite_clipboard"/>   
+            
+        
+        
+                           <Preference
+                   android:key="poem"
+			            android:summary="每日一湿"
+			            android:title="每日一诗" />
+        
+        
+        
+        
+                      <Preference
+                		android:key="test"
+			            android:summary="究极测试"
+			            android:title="究极测试 " />
+        
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory 
+        android:key="mymsg"
+        android:summary="个人信息"
+        android:title="个人信息">              
+        <EditTextPreference 
+            android:key="myname"
+            android:title="请输入真实姓名"
+            android:summary="姓名"/>          
+    </PreferenceCategory>    
+    
+</PreferenceScreen>

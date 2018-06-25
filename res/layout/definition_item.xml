@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    
+<com.knziha.ankislicer.ui.ColorFilterGettableView
+    android:id="@+id/bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginRight="3dp"
+    android:layout_marginLeft="3dp"
+    android:layout_marginTop="3dp"
+    android:background="@drawable/round_corner_card3"
+    />
+
+<LinearLayout
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+
+        <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <com.knziha.ankislicer.ui.SrcGettableTextView
+            android:id="@+id/textview_definition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:layout_weight="1"
+            android:textIsSelectable="true"
+    		android:paddingLeft="12dp"
+    		android:textSize="16sp"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_add_definition_large"
+            android:orientation="vertical">
+            <ImageButton
+                android:id="@+id/btn_add_definition"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/ic_add_blue"
+                />
+            <TextView
+                android:id="@+id/add_indicator"
+                android:layout_width="42dp"
+                android:layout_height="13dp"
+                android:layout_margin="5dp"
+                android:background="#ff0000"
+                android:visibility="gone"
+                />
+        	    <EditText
+			        android:id="@+id/et"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:text="Hindo:卧式提式"
+			        android:textColor="#dddddd"
+			        android:visibility="gone" />
+        </LinearLayout>
+        
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/expandit"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_centerVertical="true"
+        android:clickable="true"
+        android:gravity="center"
+        >
+        <ImageView 
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/scroll_down"
+        />
+        </LinearLayout>
+    <LinearLayout
+            android:id="@+id/expandible"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:background="@drawable/xuxian"
+            android:layout_below="@+id/top"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="2dp"
+            />
+    
+    
+
+</LinearLayout>
+
+
+</FrameLayout>
