@@ -59,7 +59,7 @@
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
                                 android:layout_marginRight="10dp"
-                                android:background="@drawable/ic_note_black"
+                                android:background="@drawable/ic_note_black2"
                                 android:elevation="8dp" />
 
 
@@ -172,6 +172,7 @@
 											android:focusableInTouchMode="true"
 											android:layout_marginLeft="30dp"
 											android:layout_marginRight="30dp"
+											
 								         />
          
                         </RelativeLayout>
@@ -268,9 +269,20 @@
 	                        android:layout_height="40dp"
 	                        android:orientation="horizontal"
 	                        android:gravity="center"
-	                        android:visibility="gone"
 	                        android:layout_centerHorizontal="true"
+					        android:visibility="gone"
                     	  >
+                            <ToggleButton
+					            android:id="@+id/dropmain"
+					            android:layout_width="40dp"
+					            android:layout_height="40dp"
+					            android:textOff=""
+					            android:textOn=""
+					            android:textColor="#4F7FDF"
+					            android:background="@drawable/toggle_selector3"
+					            android:layout_marginRight="15dp"
+					            />
+                             <!-- 中间-->
                             <ToggleButton
 					            android:id="@+id/mt1"
 					            android:layout_width="40dp"
@@ -291,10 +303,19 @@
 					            android:background="@drawable/toggle_selector2"
 					            android:layout_marginLeft="25dp"
 					            />
-                            
+                             <!-- 中间-->
+                            <ToggleButton
+					            android:id="@+id/autosearch"
+					            android:layout_width="40dp"
+					            android:layout_height="40dp"
+					            android:textOff=""
+					            android:textOn=""
+					            android:textColor="#4F7FDF"
+					            android:background="@drawable/toggle_selector4"
+					            android:layout_marginLeft="15dp"
+					            />
                             
                            </LinearLayout>
-			    		    <!-- 中间-->
 			    		<View
 			    		    android:id="@+id/middle_expandit"
 	                        android:layout_width="50dp"
@@ -314,7 +335,7 @@
 	android:orientation="horizontal"
     android:gravity="center"
     android:visibility="invisible"
-    android:background="#6a666666"
+    android:background="#00666666"
 >
 		<ImageView
 			android:id="@+id/actionMenu1"

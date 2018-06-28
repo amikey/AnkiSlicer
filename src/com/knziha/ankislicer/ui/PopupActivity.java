@@ -86,6 +86,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -109,6 +110,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.PopupMenu.OnMenuItemClickListener;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.ImageGetter;
@@ -200,11 +202,10 @@ public class PopupActivity extends AppCompatActivity implements
     mdict currentDictionary;
     ListViewAdapter adaptermy;
     String[] mdList;
-    List<OutputPlan> outputPlanList;
+    
     List<String> languageList;
     OutputPlan currentOutputPlan;
     Settings settings;
-    SpannableStringBuilder mTextToProcess=new SpannableStringBuilder();
     String mPlanNameFromIntent;
     String mCurrentKeyWord;
     TextSplitter mTextSplitter;
@@ -323,7 +324,8 @@ public class PopupActivity extends AppCompatActivity implements
 	            	act.removeTextChangedListener(mTW);
 	                act.setText(tmpstr);
 	            	act.addTextChangedListener(mTW);
-	                asyncSearch(tmpstr);
+	            	if(!autoSearch)
+	            		asyncSearch(tmpstr);
                 break;
                 case ASYNC_SEARCH_FAILED:
                     showSearchButton();
@@ -391,6 +393,43 @@ public class PopupActivity extends AppCompatActivity implements
 	protected boolean tvScrolled;
 	protected boolean selecChangedWhenD;
 	protected long lastOnPlanDismiss;
+	Settings mSettings;
+	onSelectionChangedListener mTSW = new onSelectionChangedListener(){
+		@Override
+		public void onSelectionChanged(int selStart, int selEnd) {
+			if(tv.hasSelection())
+				actionMenu.setVisibility(View.VISIBLE);
+			else
+				actionMenu.setVisibility(View.INVISIBLE);
+			//CMN.show("onSelectionChanged"+selStart+":"+selEnd);
+			if(selStart==selEnd){
+				selPara = true;
+				return;
+			}
+			selPara = false;
+			if(selStart==tv.selStart && selEnd==tv.selEnd)
+				return;
+			else if(selEnd==tv.selStart && selStart==tv.selEnd)
+				return;
+			//if(!isDragging)???
+			if(isDragging)
+				selecChangedWhenD=true;
+			if(true){
+				if(selStart>selEnd){
+					int tmp = selEnd;
+					selEnd = selStart;
+					selStart = tmp;
+				}
+				//showToast(selStart+":"+selEnd);
+				//eshowToast(tv.selStart+":2:"+tv.selEnd);
+				pselStart = selStart;
+				pselEnd = selEnd;
+				timer3.cancel();
+				timer3 = new Timer();
+	            timer3.schedule(new tk_gross(11), 142);///检测选择2
+			}
+		}
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	CMN.a=this;
@@ -404,11 +443,14 @@ public class PopupActivity extends AppCompatActivity implements
                                             new String[] {},
                                             new String[] {});
     	super.onCreate(savedInstanceState);
-    	
         //hide the title bar  
     	if(Build.VERSION.SDK_INT>22) {
     		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);  
     	}
+    	mSettings = Settings.getInstance(this);
+    	BGColor = mSettings.getInt("BGColor");
+    	BGColor = BGColor==-1?Color.parseColor("#ffff00"):BGColor;
+    	autoSearch = mSettings.getBoolean("autoSearch");
     	//requestWindowFeature(Window.FEATURE_NO_TITLE);  
         //setStatusBarColor();
         setContentView(R.layout.activity_popup2);
@@ -447,6 +489,7 @@ public class PopupActivity extends AppCompatActivity implements
         });
         //viewDefinitionList = (LinearLayout) findViewById(R.id.view_definition_list);
         highlightBtn = (ImageButton) findViewById(R.id.favorite);
+        highlightBtn.getBackground().setColorFilter(new LightingColorFilter(BGColor,BGColor));
         colorPicker =  findViewById(R.id.colorPicker);
         
 		
@@ -469,10 +512,12 @@ public class PopupActivity extends AppCompatActivity implements
         CMN.sdkVersionCode=Build.VERSION.SDK_INT;
 		//tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,scale(this,81));
 
-        findViewById(R.id.mt1).setOnClickListener(toggleOnclick);
-        findViewById(R.id.mt2).setOnClickListener(toggleOnclick);
         middle_expandit = findViewById(R.id.middle_expandit);
         middle_expandable = findViewById(R.id.middle_expandable);
+        middle_expandable.findViewById(R.id.mt1).setOnClickListener(toggleOnclick);
+        middle_expandable.findViewById(R.id.mt2).setOnClickListener(toggleOnclick);
+        middle_expandable.findViewById(R.id.dropmain).setOnClickListener(toggleOnclick);
+        middle_expandable.findViewById(R.id.autosearch).setOnClickListener(toggleOnclick);
         middle_expandit.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -480,7 +525,10 @@ public class PopupActivity extends AppCompatActivity implements
 					((ToggleButton)middle_expandable.findViewById(R.id.mt1)).setChecked(true);
 				if(un_review_mainnote) 
 					((ToggleButton)middle_expandable.findViewById(R.id.mt2)).setChecked(true);
-				
+				if(mMainNoteId!=0)
+					((ToggleButton)middle_expandable.findViewById(R.id.dropmain)).setChecked(true);
+				if(autoSearch)
+					((ToggleButton)middle_expandable.findViewById(R.id.autosearch)).setChecked(true);
 				if(middle_expandable.getVisibility()!=View.VISIBLE)
 					middle_expandable.setVisibility(View.VISIBLE);
 				else
@@ -547,42 +595,7 @@ public class PopupActivity extends AppCompatActivity implements
 			}
 		});
         act.addTextChangedListener(mTW);
-        tv.setOnSelectionChangedListener(new onSelectionChangedListener(){
-			@Override
-			public void onSelectionChanged(int selStart, int selEnd) {
-				if(tv.hasSelection())
-					actionMenu.setVisibility(View.VISIBLE);
-				else
-					actionMenu.setVisibility(View.INVISIBLE);
-				//CMN.show("onSelectionChanged"+selStart+":"+selEnd);
-				if(selStart==selEnd){
-					selPara = true;
-					return;
-				}
-				selPara = false;
-				if(selStart==tv.selStart && selEnd==tv.selEnd)
-					return;
-				else if(selEnd==tv.selStart && selStart==tv.selEnd)
-					return;
-				//if(!isDragging)???
-				if(isDragging)
-					selecChangedWhenD=true;
-				if(true){
-					if(selStart>selEnd){
-						int tmp = selEnd;
-						selEnd = selStart;
-						selStart = tmp;
-					}
-					//showToast(selStart+":"+selEnd);
-					//eshowToast(tv.selStart+":2:"+tv.selEnd);
-					pselStart = selStart;
-					pselEnd = selEnd;
-					timer3.cancel();
-					timer3 = new Timer();
-		            timer3.schedule(new tk_gross(11), 142);///检测选择2
-				}
-			}
-        });
+        tv.setOnSelectionChangedListener(mTSW );
       //![1] 获取x,y位置
       		tv.setOnTouchListener(new View.OnTouchListener() {
       			
@@ -785,11 +798,12 @@ public class PopupActivity extends AppCompatActivity implements
 				return true;
 			}});
 
-        loadData(); //dictionaryList;
+    	
+        settings = Settings.getInstance(this);
         loadPlan();//首次加载词典 
         //CMN.deckSelected = currentOutputPlan.getOutputDeckId();
         populateLanguageSpinner();
-        setEventListener();
+        
         adaptermy = new ListViewAdapter(currentDictionary);//首次设置词典 
         act.setAdapter(adaptermy);
         scanSettings();
@@ -879,7 +893,7 @@ public class PopupActivity extends AppCompatActivity implements
 						if(!selecChangedWhenD) {
 						//CMN.show("ShowTvSelecionHandle");
 						tv.ShowTvSelecionHandle();
-						if(Build.VERSION.SDK_INT>=24) 
+						if(Build.VERSION.SDK_INT==24) //anroid he he
 							tv.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP,tv.xmy,tv.ymy, 0));
 						}
 					}
@@ -920,7 +934,7 @@ public class PopupActivity extends AppCompatActivity implements
 					if(tv.hasSelection()&&tv.sHided) {
 						//CMN.show("ShowTvSelecionHandle");
 						tv.ShowTvSelecionHandle();
-						if(Build.VERSION.SDK_INT>=24) 
+						if(Build.VERSION.SDK_INT==24) //anroid he he
 							tv.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP,tv.xmy,tv.ymy, 0));
 
 					}
@@ -943,41 +957,13 @@ public class PopupActivity extends AppCompatActivity implements
         }
     }
 
-    private void assignViews() {
-
-    }
-
-    private void loadData() {
-        //dictionaryList = DictionaryRegister.getDictionaryObjectList();
-        outputPlanList = DataSupport.findAll(OutputPlan.class);
-
-
-        settings = Settings.getInstance(this);
-        //新日漢大辭典.mdx
-			//mdTest = new mdict("/sdcard/mdictlib/ode2_raw.mdx",false);//ODE2双解(from3in1).mdx
-		
-        //load tag
-        boolean loadQ = settings.getSetAsDefaultTag();
-        if (loadQ) {
-            mTagEditedByUser.add(settings.getDefaulTag());
-        }
-        //check if outputPlanList is empty
-        if(outputPlanList.size() == 0){
-            Toast.makeText(this, R.string.toast_no_available_plan, Toast.LENGTH_LONG).show();
-        }
-    }
 
     private void loadPlan() {
-        String[] planNameArr = new String[outputPlanList.size()];
-        for (int i = 0; i < outputPlanList.size(); i++) {
-            planNameArr[i] = outputPlanList.get(i).getPlanName();
-        }
-
         currentOutputPlan = OutputPlan.resumeFromDisk();
-        
         if (currentOutputPlan==null)
         {//初始化
-        	//CMN.show("没有的啦");
+        	List<OutputPlan> outputPlanList;
+        	outputPlanList = DataSupport.findAll(OutputPlan.class);
             if (outputPlanList.size() > 0) {
             	int lastSelectedPlan = settings.getLastSelectedPlanPos();
             	//CMN.show(""+lastSelectedPlan);
@@ -992,23 +978,17 @@ public class PopupActivity extends AppCompatActivity implements
             	}
                 currentOutputPlan.saveToDisk();
             } 
-        }else {
-        	//CMN.show("有的啦");
         }
 
         if(currentOutputPlan==null) {
-            Toast.makeText(PopupActivity.this, "方案未配置，无法启动浮窗", Toast.LENGTH_LONG).show();
-			finish();
-			System.exit(0);
-        }
-        
-        mdList = currentOutputPlan.getMdicts();
-        try {
+            Toast.makeText(this, R.string.toast_no_available_plan, Toast.LENGTH_LONG).show();
+        }else try {
+        	mdList = currentOutputPlan.getMdicts();
         	initDictAt(mdList[denv.currDictIdx=currentOutputPlan.homeDictIdx]);
-        } catch (IOException e) {
+        } catch (Exception e) {
 			e.printStackTrace();
 		}
-        
+
     }
 
     private void populateLanguageSpinner() {
@@ -1019,10 +999,6 @@ public class PopupActivity extends AppCompatActivity implements
         languagesSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         pronounceLanguageSpinner.setAdapter(languagesSpinnerAdapter);
         pronounceLanguageSpinner.setSelection(settings.getLastPronounceLanguage());
-
-    }
-
-    private void setEventListener() {
 
         //auto finish
         pronounceLanguageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1052,17 +1028,6 @@ public class PopupActivity extends AppCompatActivity implements
                     	PopupActivity.this.startActivity(i);
                     }catch(Exception e) {
                         Toast.makeText(PopupActivity.this, "Anki启动失败：未安装Anki或指派的启动Activity不可访问\n"+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                    }
-                    Class<?> myClass = AdapterView.class;
-                    if(false)
-                    try {
-                    	
-                        Field field = myClass.getDeclaredField("mOldSelectedPosition");
-                        field.setAccessible(true);
-                        //field.setInt(pronounceLanguageSpinner,settings.getLastPronounceLanguage());
-                        field.setInt(pronounceLanguageSpinner,settings.getLastPronounceLanguage());//奇怪的是两个spinner竟然会连觉
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -1187,7 +1152,8 @@ public class PopupActivity extends AppCompatActivity implements
 		    	asd.setColorPickerDialogListener(new ColorPickerDialogListener() {
 					@Override
 					public void onColorSelected(int dialogId, int Color) {
-						BGColor=Color;
+						mSettings.putInt("BGColor",BGColor=Color);
+						highlightBtn.getBackground().setColorFilter(new LightingColorFilter(BGColor,BGColor));
 					}
 
 					@Override
@@ -1281,7 +1247,12 @@ public class PopupActivity extends AppCompatActivity implements
 		                    onSelectedFilePaths(String[] files) { //files is the array of the paths of files selected by the Application User. 
 		                    	if(files.length>0) {
 		                    		Settings.getInstance(PopupActivity.this).putString("lastMdlibPath",new File(files[0]).getParent());
-		                        	ArrayList<String> mdArray =  new ArrayList<>(Arrays.asList(mdList));
+		                    		ArrayList<String> mdArray;
+		                    		boolean doNotPopulate = (mdList.length==1) && (mdList[0].equals(""));
+		                    		if(doNotPopulate)
+		                    			mdArray=new ArrayList<>();
+		                    		else
+		                    			mdArray =  new ArrayList<>(Arrays.asList(mdList));
 			                    	for(String fi:files){
 			                        	if(!mdArray.contains(fi))
 			                        		mdArray.add(fi);
@@ -1408,6 +1379,21 @@ public class PopupActivity extends AppCompatActivity implements
 		tabLayout.addTab(tabLayout.newTab().setText("正面"));
 		tabLayout.addTab(tabLayout.newTab().setText("背面"));
 		((EditText)l.findViewById(R.id.TNC_et)).setText(top_new_card_Span[0]);
+		Toolbar toolbar = l.findViewById(R.id.toolbar);
+		toolbar.inflateMenu(R.menu.new_card_interface);
+		toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem m) {
+				switch(m.getItemId()) {
+					case R.id.delete:
+						EditText top_new_card_et =(EditText)l.findViewById(R.id.TNC_et);
+						top_new_card_Span[0].clear();
+						top_new_card_Span[1].clear();
+						top_new_card_et.setText(top_new_card_Span[top_new_card_OldSelected]);
+					break;
+				}
+				return false;
+			}});
 		tabLayout.setOnTabSelectedListener(new OnTabSelectedListener() {
 			@Override
 			public void onTabReselected(Tab t) {
@@ -1497,7 +1483,9 @@ public class PopupActivity extends AppCompatActivity implements
 	};*/
 	private void handleIntent() {
 		mMainNoteId = 0l;
-    	mTextToProcess.clear();
+
+	    
+    	//mTextToProcess.clear();
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
@@ -1512,26 +1500,27 @@ public class PopupActivity extends AppCompatActivity implements
 	        //todo 自动选择
 	        return;
         }
-        
+        baseSpan=new SpannableStringBuilder();
         //if (type == null) return;
         //CMN.show(action+":"+type);
         //getStringExtra() may return null
         
         if (Intent.ACTION_SEND.equals(action)) {//分享、剪贴板监控
+        	URLImageParser imgParser = new URLImageParser(tv, this);
         	if(type.contains("text/plain")) {
 	        	//CMN.show("ACTION_SEND!");
 	        	if(intent.hasExtra(Intent.EXTRA_HTML_TEXT)) {
 	        		if(Build.VERSION.SDK_INT>=24)
-		            	mTextToProcess.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_HTML_TEXT), Html.FROM_HTML_MODE_COMPACT, new URLImageParser(tv, this) ,null));
+	        			baseSpan.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_HTML_TEXT), Html.FROM_HTML_MODE_COMPACT, imgParser ,null));
 	                else
-		            	mTextToProcess.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_HTML_TEXT), new URLImageParser(tv, this) ,null));
+	                	baseSpan.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_HTML_TEXT),  imgParser,null));
 	        	}
 	        	else
-	        		mTextToProcess.append(intent.getStringExtra(Intent.EXTRA_TEXT));//.replace("\n", "<br>")
+	        		baseSpan.append(intent.getStringExtra(Intent.EXTRA_TEXT));//.replace("\n", "<br>")
 	            if(type!=null && type.contains("image/*")) {//追加图片
 	            	Uri uri=intent.getParcelableExtra(Intent.EXTRA_STREAM);
 	            	ImageUrlAssit.getInstance().resTmp.put(uri.getPath() , uri);
-	            	mTextToProcess.append("<img src=\""+uri.getPath()+"\" />");
+	            	baseSpan.append(Html.fromHtml("<br><img src=\""+uri.getPath()+"\" />", Html.FROM_HTML_MODE_COMPACT, imgParser ,null));
 	            }
 	            //mTargetWord = intent.getStringExtra(Constant.INTENT_ANKIHELPER_TARGET_WORD);
 	            //mUrl = intent.getStringExtra(Constant.INTENT_ANKIHELPER_TARGET_URL);
@@ -1554,10 +1543,10 @@ public class PopupActivity extends AppCompatActivity implements
         	}
         	
         	
-        	URLSpan[] spans = mTextToProcess.getSpans(0, mTextToProcess.length(), URLSpan.class);
+        	URLSpan[] spans = baseSpan.getSpans(0, baseSpan.length(), URLSpan.class);
 			for(URLSpan span:spans) {
-				mTextToProcess.insert(mTextToProcess.getSpanStart(span), " ");
-				mTextToProcess.removeSpan(span);
+				baseSpan.insert(baseSpan.getSpanStart(span), " ");
+				baseSpan.removeSpan(span);
 			}
         	
     	}else if (Intent.ACTION_PROCESS_TEXT.equals(action)) {
@@ -1565,9 +1554,9 @@ public class PopupActivity extends AppCompatActivity implements
     			//CMN.show(""+intent.getCharArrayExtra(Intent.EXTRA_TEXT));
     			if(Build.VERSION.SDK_INT>=24)
         			//mTextToProcess.append(intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT).replace("\n", "<br>"));
-        			mTextToProcess.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT).replace("\n", "<br>"), Html.FROM_HTML_MODE_COMPACT));
+    				baseSpan.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT).replace("\n", "<br>"), Html.FROM_HTML_MODE_COMPACT));
     	        else
-        			mTextToProcess.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT).replace("\n", "<br>")));
+    	        	baseSpan.append(Html.fromHtml(intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT).replace("\n", "<br>")));
     		}
 			//CMN.show(""+Html.toHtml(new SpannableString(intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT))));
     		//CMN.show(""+intent.hasExtra(Intent.EXTRA_HTML_TEXT));
@@ -1581,9 +1570,9 @@ public class PopupActivity extends AppCompatActivity implements
 				fin.close();
 				JSONObject all = new JSONObject(new String(buffer));
 				if(Build.VERSION.SDK_INT>=24)
-	    			mTextToProcess.append(Html.fromHtml(all.getString("html"), Html.FROM_HTML_MODE_COMPACT));
+					baseSpan.append(Html.fromHtml(all.getString("html"), Html.FROM_HTML_MODE_COMPACT));
 		        else
-	    			mTextToProcess.append(Html.fromHtml(all.getString("html")));
+		        	baseSpan.append(Html.fromHtml(all.getString("html")));
 				
 				String mainkey = all.getString("mainkey");
 				if(!mainkey.equals(""))
@@ -1591,7 +1580,7 @@ public class PopupActivity extends AppCompatActivity implements
 					String[] ab = i.split(" ");
 					int a = Integer.valueOf(ab[0]);
 					int b = Integer.valueOf(ab[1]);
-					mTextToProcess.setSpan(new KeyWordSpan(PopupActivity.this), a, b, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+					baseSpan.setSpan(new KeyWordSpan(PopupActivity.this), a, b, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 				}
 				
         	} catch (IOException e) {
@@ -1604,14 +1593,10 @@ public class PopupActivity extends AppCompatActivity implements
     		//CMN.show(""+intent.hasExtra(Intent.EXTRA_HTML_TEXT));
         }
         
-        if (mTextToProcess == null) {
-            return;
-        }
         
         
         //baseSpan.setSpan(new MyClickText2(PopupActivity.this), 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        baseSpan=mTextToProcess;
         //tv.setMovementMethod(new LinkMovementMethod()); buggy
         tv.setText(baseSpan);
 
@@ -1666,6 +1651,9 @@ public class PopupActivity extends AppCompatActivity implements
                     HashMap<String, String> eleMap = new HashMap<>();
         	        int idx = currentDictionary.lookUp(word);
         	        
+        	        if(idx!=-1)
+                    	denv.current_hwd = currentDictionary.getEntryAt(idx).toLowerCase();
+        	        	
     	        	while(idx>0) {
 						String tmp = currentDictionary.getEntryAt(idx-1);
 						if(!tmp.toLowerCase().equals(denv.current_hwd))
@@ -1684,7 +1672,6 @@ public class PopupActivity extends AppCompatActivity implements
     	        	if(tmptmp!=null)
     	        		DefinitionListTmp=(LinearLayoutmy) tmptmp.value;
     	        	else if(idx!=-1) {
-                    	denv.current_hwd = currentDictionary.getEntryAt(idx).toLowerCase();
                     	while(true) {
                     		handleRecordAt(idx,DefinitionListTmp);
                         	//ds.add(new Definition(eleMap,mdTest.getRecordAt(idx)));
@@ -1699,9 +1686,13 @@ public class PopupActivity extends AppCompatActivity implements
                     }
                     recyclerViewDefinitionList = DefinitionListTmp;
                 } catch (Exception e) {
-                	e.printStackTrace();
-                	//不知为何Toast就不会进入finally
-                	message.obj = "出错："+e.getLocalizedMessage();
+                	if(currentDictionary==null)
+                		message.obj = "无可用词典: no dictionary available";
+                	else {
+	                	e.printStackTrace();
+	                	//不知为何Toast就不会进入finally
+	                	message.obj = "出错："+e.getLocalizedMessage();
+                	}
                 }finally {
                 	if(false && recyclerViewDefinitionList.getChildCount()==0){
                         try{
@@ -1978,7 +1969,17 @@ public class PopupActivity extends AppCompatActivity implements
 	                        long modelId = currentOutputPlan.getOutputModelId();
 
 	                        String[] map = currentOutputPlan.getFieldsMap();
-	                        String[] FieldList = getModelFieldList(modelId);//mAnkiDroid.getApi().getFieldList(modelId);
+	                        
+	                        String[] FieldList = null;
+	                        try{
+	                        	FieldList = getModelFieldList(modelId);//mAnkiDroid.getApi().getFieldList(modelId);
+	                        }catch (Exception e) {
+	                		}finally {
+	                			if(FieldList==null) {
+	                				Toast.makeText(PopupActivity.this, "添加失败！"+"可能是Anki没有打开，请打开以建立连接\n", Toast.LENGTH_SHORT).show();
+		                            return;
+	                			}
+	                		}
 	                        String[] exportFields = new String[FieldList.length];//开始构造输出内容
 	                        int sdkId = Build.VERSION.SDK_INT;
 	                        //if(map.length!=exportFields.length)
@@ -2383,7 +2384,13 @@ public class PopupActivity extends AppCompatActivity implements
 			.getStringSet("mainNoteStyle", null);
 		
         AnkiDroidHelper mAnkiDroid = MyApplication.getAnkiDroid();
-    	Long basicCardMid = mAnkiDroid.findModelIdByName("Slicer Basic", 2);
+    	Long basicCardMid=0l;
+    	try {
+    		basicCardMid = mAnkiDroid.findModelIdByName("Slicer Basic", 2);
+    	}catch (Exception e) {
+            Toast.makeText(PopupActivity.this, "添加失败！"+"可能是Anki没有打开，请打开以建立连接\n"+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            return;
+		}
         if (basicCardMid == null) {
         	basicCardMid = mAnkiDroid.getApi().addNewCustomModel("Slicer Basic",
 	                new String[] {"Front","Back"},
@@ -2512,6 +2519,7 @@ public class PopupActivity extends AppCompatActivity implements
         
         long deckId = currentOutputPlan.getOutputDeckId();
         if(mMainNoteId == 0){
+        	((ToggleButton)middle_expandable.findViewById(R.id.dropmain)).setChecked(true);
         	Long result=null;
         	try {
         		List<NoteInfo> searchRes = mAnkiDroid.getApi().findDuplicateNotes(basicCardMid, exportFields[0]);
@@ -2585,7 +2593,7 @@ public class PopupActivity extends AppCompatActivity implements
 		StringBuilder sb = new StringBuilder();
 		int baseIdx=0;
 		int offA = str.indexOf("<img src=\"");
-		if(offA!=-1) {
+		while(offA!=-1) {
 			int offB = str.indexOf("\">",offA);
 			sb.append(str.substring(baseIdx,offA+"<img src=\"".length()));
 			String src = str.substring(offA+"<img src=\"".length(),offB);
@@ -2646,14 +2654,24 @@ public class PopupActivity extends AppCompatActivity implements
 	PopupWindow sharePopup;
 	boolean isPopUpShown;
 	long preVDissmissT=-1;
+	protected boolean autoSearch;
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onClick(View v) {
+		int st,ed;
 		switch(v.getId()) {
 			case R.id.actionMenu1:
+				st = tv.getSelectionStart();
+				ed = tv.getSelectionEnd();
+				if(!tv.hasSelection()) {
+					if(currentSpanOnFocus==null)
+						break;
+					st = baseSpan.getSpanStart(currentSpanOnFocus);
+					ed = baseSpan.getSpanEnd(currentSpanOnFocus);
+				}
 				SpannableStringBuilder tmpBuilder = (SpannableStringBuilder) Html.fromHtml(Html.toHtml(baseSpan));
-				tmpBuilder.delete(tv.getSelectionEnd(),tmpBuilder.length());
-				tmpBuilder.delete(0, tv.getSelectionStart());
+				tmpBuilder.delete(ed,tmpBuilder.length());
+				tmpBuilder.delete(0, st);
 				Intent intent = new Intent(this, PopupActivity.class);
             	intent.setAction(Intent.ACTION_PROCESS_TEXT);
             	intent.setType("text/plain");
@@ -2661,13 +2679,28 @@ public class PopupActivity extends AppCompatActivity implements
             	startActivity(intent);
 			break;
 			case R.id.actionMenu2://toggle设置key
-				if(tv.hasSelection()){
+				if(true){//tv.hasSelection()
                 	boolean isSpanFound = false;
-					int st = tv.getSelectionStart();
-					int ed = tv.getSelectionEnd();
+					st = tv.getSelectionStart();
+					ed = tv.getSelectionEnd();
+					if(!tv.hasSelection()) {
+						if(currentSpanOnFocus==null)
+							break;
+						baseSpan.removeSpan(currentSpanOnFocus);
+						currentSpanOnFocus=null;
+						tv.highlightBounds=null;
+						tv.setTextKeepState(baseSpan);
+						tv.invalidate();
+						break;
+					}
 					KeyWordSpan[] spans = baseSpan.getSpans(st, ed, KeyWordSpan.class);
 					for(KeyWordSpan span:spans) {
 						if(baseSpan.getSpanStart(span)==st && baseSpan.getSpanEnd(span)==ed) {
+							if(currentSpanOnFocus==span) {
+								currentSpanOnFocus=null;
+								tv.highlightBounds=null;
+								tv.invalidate();
+							}
 							baseSpan.removeSpan(span);
 							if(Build.VERSION.SDK_INT>=24)
 								tv.onKeyDown(KeyEvent.KEYCODE_BACK, new KeyEvent(KeyEvent.KEYCODE_BACK,KeyEvent.ACTION_DOWN));
@@ -2945,7 +2978,8 @@ public class PopupActivity extends AppCompatActivity implements
 		boolean ck;
 		@Override
 		public void onClick(View v) {
-			ck = ((ToggleButton)v).isChecked();//这个是点击之后的值
+			ToggleButton tg = (ToggleButton)v;
+			ck = tg.isChecked();//这个是点击之后的值
 			switch(v.getId()){
 		        case R.id.mt1://自动展开例句
 		        	//CMN.show(""+ck);
@@ -2983,6 +3017,17 @@ public class PopupActivity extends AppCompatActivity implements
 						@Override 
 						public void run() {middle_expandable.setVisibility(View.GONE);}
 						}, 250);
+	    		break;
+		    	case R.id.dropmain:
+		    		if(ck) {//只有下降沿有效
+		    			tg.setChecked(false);
+		    		}else {
+		    			mMainNoteId=0l;
+		    			show("Last Main Note Dropped");
+		    		}
+	    		break;
+		    	case R.id.autosearch:
+		    		mSettings.putBoolean("autoSearch",autoSearch = ck);
 	    		break;
 			}
 		}};
@@ -3176,5 +3221,22 @@ public class PopupActivity extends AppCompatActivity implements
 			//EventBus.getDefault().post(new InputMethodChangeEvent(distance,mCurrentImageId));
 		}
 
+		Toast m_currentToast;
+		TextView toastTv;
+		View toastV;
+	    public void show(String text)
+	    {
+	        if(m_currentToast == null){
+		        toastV = getLayoutInflater().inflate(R.layout.toast,null);
+		        toastTv = ((TextView) toastV.findViewById(R.id.message));
+	        	m_currentToast = new Toast(this);
 
+		        m_currentToast.setDuration(Toast.LENGTH_SHORT);
+		        m_currentToast.setGravity(Gravity.BOTTOM, 0, 45);
+		        m_currentToast.setView(toastV);
+	        }
+	        //m_currentToast = Toast.makeText(getContext(), text, Toast.LENGTH_SHORT);
+	        toastTv.setText(text);
+	        m_currentToast.show();
+	    }
 }

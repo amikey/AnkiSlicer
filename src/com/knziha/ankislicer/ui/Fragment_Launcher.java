@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -126,9 +127,10 @@ public class Fragment_Launcher extends PreferenceFragment  {
     		String today = new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
     		final File TODAY = new File("/sdcard/AnkiDroid/3rd_SlicerDir/DailyPoems/"+today+".json");
     		final File CURSOR = new File("/sdcard/AnkiDroid/3rd_SlicerDir/DailyPoems/PoemPoolCursor");
-    		new AsyncTask<Void,Void,Void>(){
+    		new AsyncTask<Void,Void,String>(){
 				@Override
-				protected Void doInBackground(Void... params) {
+				protected String doInBackground(Void... params) {
+					String errorMsg=null;
 					if(!TODAY.exists())
 					try {
 						CURSOR.mkdirs();
@@ -164,19 +166,25 @@ public class Fragment_Launcher extends PreferenceFragment  {
 						fout.write(gg.toString().getBytes());
 						fout.flush();
 						fout.close();
+						return errorMsg;
 					} catch (IOException e) {
 						e.printStackTrace();
+						errorMsg = e.getLocalizedMessage();
 					}
-					return null;
+					return errorMsg;
 				}
 				
 				@Override
-		        protected void onPostExecute(Void result) {
-	            	Intent intent = new Intent(getActivity(), PopupActivity.class);
-		        	intent.setAction(Constant.ACTION_OPEN_PROJECT);
-		        	intent.putExtra(Constant.EXTRA_PROJECT_PATH, TODAY.getAbsolutePath());
-		        	intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		        	startActivity(intent);
+		        protected void onPostExecute(String errorMsg) {
+					if(errorMsg==null) {
+		            	Intent intent = new Intent(getActivity(), PopupActivity.class);
+			        	intent.setAction(Constant.ACTION_OPEN_PROJECT);
+			        	intent.putExtra(Constant.EXTRA_PROJECT_PATH, TODAY.getAbsolutePath());
+			        	intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			        	startActivity(intent);
+					}else {
+						Toast.makeText(getActivity(), "连接出错："+errorMsg, Toast.LENGTH_SHORT).show();
+					}
 				}
 				
 			}.execute();

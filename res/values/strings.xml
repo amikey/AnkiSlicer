@@ -2,6 +2,8 @@
     <string name="app_name">Anki Slicer</string>
     <string name="default_deck_name">ANKI_Slicer✎</string>
     <string name="addNewNote">Add Main Note</string>
+    <string name="deleteEN">Reset Extra Notes</string>
+    <string name="endr">End Reached</string>
     <string name="title_activity_plans_manager">Plan Manager</string>
     <string name="tv_plan_name">Plan Name:</string>
     <string name="title_activity_plan_editor">Plan Editor</string>

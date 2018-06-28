@@ -21,7 +21,10 @@ public class RBTNode<T extends Comparable<? super T> > {
     public T getKey() {
         return key;
     }
-
+    //!perilous operation
+    public void setKey(T newVal) {
+        key = newVal;
+    }
     public String toString() {
         return ""+key+(this.color==RED?"(R)":"B");
     }

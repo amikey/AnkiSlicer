@@ -97,16 +97,32 @@ public class MyClickText extends ClickableSpan{
         					(LinearLayout) ppp.getParent()));
         			//初次加入该 key span需要高亮之
         			context.baseSpan.setSpan(new KeyWordSpan(context), context.pselStart,context.pselEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        			//context.tv.clearFocus();
+        			
         			context.tv.setTextKeepState(context.baseSpan);
+
+        			
+        			//if(Build.VERSION.SDK_INT==24)
         			if(context.tv.hasSelection()) {//需要恢复选择
-	        			context.tv.post(new Runnable() {
+        				final int st = context.tv.getSelectionStart();
+        				final int ed = context.tv.getSelectionEnd();
+        				context.tv.post(new Runnable() {
 							@Override
 							public void run() {
 								context.tv.ShowTvSelecionHandle();
-								if(Build.VERSION.SDK_INT>=24) 
+								if(Build.VERSION.SDK_INT>=24) {
+									if(Build.VERSION.SDK_INT>=25)
+									context.tv.setOnSelectionChangedListener(null);
 									context.tv.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP,context.tv.xmy,context.tv.ymy, 0));
-								}								
-							});
+								}
+								if(Build.VERSION.SDK_INT>=25)
+								context.tv.postDelayed(new Runnable() {
+									@Override
+									public void run() {
+										context.tv.setSelection(st, ed);
+										context.tv.setOnSelectionChangedListener(context.mTSW);
+									}}, 200);
+							}});
         			}
         		}
         	

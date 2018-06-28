@@ -62,7 +62,6 @@ public class KeyWordSpan extends ClickableSpan{
         		((TextViewmy)widget).invalidate();
         		return;
         	}
-        		
         	Spanned span = (Spanned) ((TextView)widget).getText();
         	//Toast.makeText(context,"发生了点击效果"+span.getSpanStart(this)+":"+span.getSpanEnd(this),Toast.LENGTH_SHORT).show();
         	final int offA = span.getSpanStart(this);
@@ -110,6 +109,13 @@ public class KeyWordSpan extends ClickableSpan{
 		        		}
 		        	}
 				}});
+        	widget.post(new Runnable() {
+
+				@Override
+				public void run() {
+	        		context.actionMenu.setVisibility(View.VISIBLE);
+				}
+        		});
         	
         }
     }

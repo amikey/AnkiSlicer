@@ -203,9 +203,10 @@ public class dict_manager_activity extends FragmentActivity implements OnClickLi
                     public void onClick(DialogInterface dialog, int whichButton) {
                     	ArrayList<Integer> l = f1.Selection.flatten();
                     	for(int i=0;i<l.size();i++) {
-                    		int pos = l.size()-i-1;//count down
+                    		int pos = l.get(l.size()-i-1);//count down
                     		f1.list.remove(pos);
                     	}
+                    	f1.Selection.clear();
                     	if(f1.list.size()==0)
                     		f1.SelectionMode=false;
                     	f1.adapter.notifyDataSetChanged();

@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class OutputPlan extends DataSupport {
     private String planName;
-    private String mdPaths="/sdcard/mdictlib/ode2_raw.mdx\n/sdcard/mdictlib/NameOfPlants.mdx\n/sdcard/mdictlib/新日漢大辭典.mdx\n/sdcard/mdictlib/Irish-En.mdx\n/sdcard/mdictlib/俄汉汉俄辞典.mdx";
+    private String mdPaths="";///sdcard/mdictlib/ode2_raw.mdx\n/sdcard/mdictlib/NameOfPlants.mdx\n/sdcard/mdictlib/新日漢大辭典.mdx\n/sdcard/mdictlib/Irish-En.mdx\n/sdcard/mdictlib/俄汉汉俄辞典.mdx
 	private String fieldsMap_internal="";
 	
 	

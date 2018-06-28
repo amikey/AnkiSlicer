@@ -3,6 +3,8 @@
     <string name="app_name">Anki 划书</string>
     <string name="default_deck_name">ANKI_划书✎</string>
     <string name="addNewNote">主笔记添加</string>
+    <string name="deleteEN">重置附加笔记</string>
+    <string name="endr">端部已到达</string>
     <string name="title_activity_plans_manager">划词方案管理</string>
     <string name="tv_plan_name">方案名称:</string>
     <string name="title_activity_plan_editor">方案编辑器</string>

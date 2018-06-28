@@ -10,6 +10,8 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fenwjian.sdcardutil.RBTNode;
+import com.fenwjian.sdcardutil.RBTree.inOrderDo;
 import com.fenwjian.sdcardutil.RashMap;
 import com.fenwjian.sdcardutil.RashSet;
 import com.ichi2.anki.CollectionHelper;
@@ -25,8 +27,11 @@ import com.mmjang.ankihelper.programData.Settings;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -38,8 +43,10 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Html.ImageGetter;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,6 +68,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import momo.htmlutil.URLImageParser;
 
 
 public class Fragment_CardViewer extends Fragment implements 
@@ -146,7 +154,7 @@ public class Fragment_CardViewer extends Fragment implements
         fastScroller = (VerticalRecyclerViewFastScrollermy) main_clister_layout.findViewById(R.id.fast_scroller);
         //bookMarker = (BookMarkView) main_clister_layout.findViewById(R.id.fast_scroller);
         fastScroller.setRecyclerView(lv);
-        fastScroller.setConservativeScroll(!mSettings.getBoolean("strictscroll"));
+        fastScroller.setConservativeScroll(mSettings.getBoolean("strictscroll"));
         lv.addOnScrollListener(fastScroller.getOnScrollListener());
         
 		lv.setAdapter(mAdapter);
@@ -248,7 +256,7 @@ public class Fragment_CardViewer extends Fragment implements
 	        	
 	        	DeckTask.launchDeckTask(DeckTask.TASK_TYPE_SEARCH_CARDS, mSearchCardsHandler2, new DeckTask.TaskData(
 	                    new Object[] { new HashMap<>(), mRestrictOnDeck+" "+query.toString(), ((true)),  0}));//"deck:\""+allNames.get(0)+"\""
-
+	        	searchView.clearFocus();
         	    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         	    imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
 	            
@@ -328,6 +336,7 @@ public class Fragment_CardViewer extends Fragment implements
             		.append("\"").toString();
 	    	DeckTask.launchDeckTask(DeckTask.TASK_TYPE_SEARCH_CARDS, mSearchCardsHandler, new DeckTask.TaskData(
 	                new Object[] { new HashMap<>(), mRestrictOnDeck, ((true)),  0}));//"deck:\""+allNames.get(0)+"\""
+	    	show(names[position]);
 		}},
 	changeDeckListener = new ListView.OnItemClickListener() {
 		@Override
@@ -374,7 +383,7 @@ public class Fragment_CardViewer extends Fragment implements
 		super.onActivityCreated(savedInstanceState);;
 		mCol = CollectionHelper.getInstance().getCol(getActivity());
     	Decks mDeck = mCol.getDecks();
-
+        
         mRestrictOnDeck = "";
 
 		ArrayList<String> k = new ArrayList<>();
@@ -415,8 +424,11 @@ public class Fragment_CardViewer extends Fragment implements
 		if(selectedPosition!=-1) {
 			mRestrictOnDeck = "deck:\""+names[selectedPosition]+"\"";
 			mDrawerList.setItemChecked(lastChecked=selectedPosition, true);
-		}else
+			show(names[selectedPosition]);
+		}else {
 			lastChecked=-1;
+			show(getResources().getString(R.string.browseall));
+		}
 		
     	DeckTask.launchDeckTask(DeckTask.TASK_TYPE_SEARCH_CARDS, mSearchCardsHandler, new DeckTask.TaskData(
                 new Object[] { new HashMap<>(), mRestrictOnDeck, ((true)),  0}));//"deck:\""+allNames.get(0)+"\""
@@ -425,10 +437,25 @@ public class Fragment_CardViewer extends Fragment implements
 		
 	}
   
-    //设置
+
+
+	//设置
     void scanSettings(){}
 	void dumpSettiings(){}
 	
+	ImageGetter ig = new ImageGetter() {
+		@Override
+		public Drawable getDrawable(String path) {
+			//CMN.show("/sdcard/AnkiDroid/collection.media/"+path);
+			Drawable d = Drawable.createFromPath("/sdcard/AnkiDroid/collection.media/"+path);
+			if(d!=null) {
+				float scale = getActivity().getResources().getDisplayMetrics().density;
+				d.setBounds(0,0,(int)(d.getIntrinsicWidth()*scale),(int) (d.getIntrinsicHeight()*scale));
+				
+			}
+			//CMN.show((d==null)+"");
+			return d;
+		}};
 
 	RashMap<Long,Integer> Selection = new RashMap<>();
     //for main list 
@@ -490,8 +517,11 @@ public class Fragment_CardViewer extends Fragment implements
             	offb = tmp.lastIndexOf("</script>",offa);
             }
             		
-            holder.webView.setText(Html.fromHtml(sb.toString()));
-            
+            //holder.webView.setText(Html.fromHtml(sb.toString()));
+            if(Build.VERSION.SDK_INT>=24)
+            	holder.webView.setText(Html.fromHtml(sb.toString(), Html.FROM_HTML_MODE_COMPACT, ig ,null));
+            else
+            	holder.webView.setText(Html.fromHtml(sb.toString(), ig ,null));
             //CMN.show(asd.get("a"));
             //holder.webView.loadDataWithBaseURL("file:///",asd.get("a"),null, "UTF-8", null);
             //holder.webView.setText("a\n\ns\nd\n"+position);
@@ -607,6 +637,10 @@ public class Fragment_CardViewer extends Fragment implements
 	    };
 
 	 RashSet<Integer> mSearchResTree = new RashSet<Integer>();
+
+
+
+
 	 private DeckTask.TaskListener mSearchCardsHandler2 = new DeckTask.TaskListener() {
 	        @Override
 	        public void onProgressUpdate(TaskData... values) {
@@ -618,15 +652,21 @@ public class Fragment_CardViewer extends Fragment implements
 	                long t = System.currentTimeMillis();
 					boolean s;
 					int finder = 0;
-					String idToMatch = Cards.get(finder).get("id");
-					for(int i=0;i<mCards.size();i++) {
-					 //Card c = mCol.getCard(Long.parseLong(mCards.get(i).get("id"), 10));
-						if(mCards.get(i).get("id").equals(idToMatch)) {
-							mSearchResTree.put(i);
-							if(++finder>Cards.size()-1)
-								break;
-							idToMatch = Cards.get(finder).get("id");
-						}	
+					while(true) {//避免未及时更新card browser 而导致映射失败mSearchResTree为空而崩溃
+						String idToMatch = Cards.get(finder).get("id");
+						for(int i=0;i<mCards.size();i++) {
+						 //Card c = mCol.getCard(Long.parseLong(mCards.get(i).get("id"), 10));
+							if(mCards.get(i).get("id").equals(idToMatch)) {
+								mSearchResTree.put(i);
+								if(++finder>Cards.size()-1)
+									break;
+								idToMatch = Cards.get(finder).get("id");
+							}	
+						}
+						if(finder==0 && Cards.size()>1)
+							Cards.remove(0);
+						else
+							break;
 					}
 					//TODO need some check?
 					lm.scrollToPositionWithOffset(mSearchResTree.minimum(), toolbar.getHeight());
@@ -635,7 +675,8 @@ public class Fragment_CardViewer extends Fragment implements
 					fastScroller.invalidate();
 					//CMN.show(""+(System.currentTimeMillis()-t));
 	                //CMN.show(mCards.size()+":"+mCards.get(0).keySet().size());
-	                Toast.makeText(getActivity(), "结果数目："+Cards.size(), Toast.LENGTH_SHORT).show();
+	                
+					show("搜索完成！结果数目："+Cards.size());
 	                //CMN.show(asd.get("q"));
 	            }
 	            
@@ -672,10 +713,11 @@ public class Fragment_CardViewer extends Fragment implements
 
 		
 		int SelectionMode;
-		boolean inSearch = true;
+		boolean inSearch = false;
 		final int SelectionMode_pan=0;
 		final int SelectionMode_select=1;
 		final int SelectionMode_preview=2;
+		int DeletionCompesationAccumulater;
 		boolean inDeckListChooser = false;
 		/*神之显/隐体系*/
 		int revertage=0;
@@ -684,6 +726,7 @@ public class Fragment_CardViewer extends Fragment implements
 		@Override
 		public void onClick(final View v) {
 			int pos;
+			int offset;
 			switch(v.getId()) {
 				case R.id.tools0://pan
 					SelectionMode=SelectionMode_pan;
@@ -728,14 +771,32 @@ public class Fragment_CardViewer extends Fragment implements
                 			Selection.keysAndValues(l,lpos);
         					final long[] ids = new long[l.size()];
         					List<Map<String, String>> toDelete = new ArrayList<>();
-        					for(int i=0;i<l.size();i++) {//TODO 修正搜索树
+        					for(int i=0;i<l.size();i++) {
         						//int pos = l.size()-i-1;//count down
         						long SelectedID = l.get(i);
         						ids[i] = SelectedID;
         						//mCards.remove(lpos.get(i));
         						toDelete.add(mCards.get(lpos.get(i)));
         						Selection.remove(SelectedID,null);
+        						if(inSearch && mSearchResTree!=null && mSearchResTree.contains(lpos.get(i))) {
+        							RBTNode<Integer> next = mSearchResTree.successor(mSearchResTree.getLastSelected());
+        							if(next!=null)
+        								next.usedUp = mSearchResTree.getLastSelected().usedUp+1;
+        							mSearchResTree.removeLastSelected();
+        						}
         					}
+        					//修正搜索树
+        					mSearchResTree.SetInOrderDo(new inOrderDo<Integer>() {
+								@Override
+								public void dothis(RBTNode<Integer> node) {
+									//哈哈哈哈这么帅的代码劳资一定是天才！
+									DeletionCompesationAccumulater+=node.usedUp;
+									node.usedUp=0;
+									node.setKey(node.getKey()-DeletionCompesationAccumulater);
+								}});
+        					DeletionCompesationAccumulater=0;
+        					mSearchResTree.inOrderDo();
+        					fastScroller.invalidate();
         					mCards.removeAll(toDelete);
         					mAdapter.notifyDataSetChanged();
         					counter.setText(0+":\n"+mCards.size());
@@ -804,14 +865,50 @@ public class Fragment_CardViewer extends Fragment implements
 				case R.id.lst:
 					if(mSearchResTree==null || mSearchResTree.getRoot()==null) return;
 					lv.scrollBy(0, +toolbar.getHeight());
-					pos = mSearchResTree.xxing_samsara(lm.findFirstVisibleItemPosition()).getKey();
+					RBTNode<Integer> searchTmp = mSearchResTree.xxing_samsara(lm.findFirstVisibleItemPosition());
+					if(searchTmp==null) {
+						show(R.string.endr);
+						lv.scrollBy(0, -toolbar.getHeight());
+						break;
+					}
+					pos = searchTmp.getKey();
 					lm.scrollToPositionWithOffset(pos, toolbar.getHeight());
 				break;
 				case R.id.nxt:
 					if(mSearchResTree==null || mSearchResTree.getRoot()==null) return;
 					lv.scrollBy(0, +toolbar.getHeight());
-					pos = mSearchResTree.sxing_samsara(lm.findFirstVisibleItemPosition()).getKey();
+					RBTNode<Integer> searchTmp1 = mSearchResTree.sxing_samsara(lm.findFirstVisibleItemPosition());
+					if(searchTmp1==null) {
+						show(R.string.endr);
+						lv.scrollBy(0, -toolbar.getHeight());
+						break;
+					}
+					pos = searchTmp1.getKey();
 					lm.scrollToPositionWithOffset(pos, toolbar.getHeight());
+				break;
+				case R.id.lst_plain:
+					//show("lll");
+					offset = 0;
+					if(inSearch) {
+						lv.scrollBy(0, offset = toolbar.getHeight());
+					}
+					pos = lm.findFirstVisibleItemPosition()-1;
+					if(pos<0) {
+						show(R.string.endr);
+					}else
+						lm.scrollToPositionWithOffset(pos,offset);
+				break;
+				case R.id.nxt_plain:
+					//show("nnn");
+					offset = 0;
+					if(inSearch) {
+						lv.scrollBy(0, offset = toolbar.getHeight());
+					}
+					pos = lm.findFirstVisibleItemPosition()+1;
+					if(pos>=mAdapter.getItemCount()) {
+						show(R.string.endr);
+					}else
+						lm.scrollToPositionWithOffset(pos,offset);
 				break;
 			}
 		}
@@ -853,7 +950,7 @@ public class Fragment_CardViewer extends Fragment implements
 							mAdapter.notifyDataSetChanged();
 						break;
 						case 30://show all decks
-							mSettings.putLong("lastChecked",lastChecked=-1);
+							mSettings.putLong("browser_deckIDSelected",lastChecked=-1);
 							int iii = mDrawerList.getCheckedItemPosition();
 							if(iii>=0)
 								mDrawerList.setItemChecked(iii, false);
@@ -970,8 +1067,27 @@ public class Fragment_CardViewer extends Fragment implements
 	        return interceptClick;
 		}
 		
+		Toast m_currentToast;
+		TextView toastTv;
+		View toastV;
+		public void show(int ResId) {
+			show(getResources().getString(ResId));
+		}
+	    public void show(String text)
+	    {
+	        if(m_currentToast != null) {}//傻X,cancel个什么劲？？m_currentToast.cancel();
+	        else {
+		        toastV = getActivity().getLayoutInflater().inflate(R.layout.toast,null);
+		        toastTv = ((TextView) toastV.findViewById(R.id.message));
+	        	m_currentToast = new Toast(getContext());
 
-
-    
+		        m_currentToast.setDuration(Toast.LENGTH_SHORT);
+		        m_currentToast.setGravity(Gravity.BOTTOM, 0, 45);
+		        m_currentToast.setView(toastV);
+	        }
+	        //m_currentToast = Toast.makeText(getContext(), text, Toast.LENGTH_SHORT);
+	        toastTv.setText(text);
+	        m_currentToast.show();
+	    }
     
 }

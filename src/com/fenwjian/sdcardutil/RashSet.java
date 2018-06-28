@@ -34,24 +34,26 @@ public class RashSet<T1 extends Comparable<T1>>
 	public void removeLastSelected() {
 		remove(lastSearchRes);
 	}
+	
+	public  RBTNode<T1> getLastSelected() {
+		return lastSearchRes;
+	}
 
 	
 	@Override
     public RBTNode<T1> xxing_samsara(T1 val){
         RBTNode<T1> tmpnode =downwardNeighbour_skipego(this.mRoot,val);
-        if (tmpnode!=null) return tmpnode;
-        else {
-        	return this.maximum(this.mRoot);
-        }
+        
+        //	return this.maximum(this.mRoot);
+        return tmpnode;
     }
 	
 	@Override
     public RBTNode<T1> sxing_samsara(T1 val){
         RBTNode<T1> tmpnode =upwardNeighbour_skipego(this.mRoot,val);
-        if (tmpnode!=null) return tmpnode;
-        else {
-        	return this.minimum(this.mRoot);
-        }
+        
+        //	return this.minimum(this.mRoot);
+        return tmpnode;
     }
 
 

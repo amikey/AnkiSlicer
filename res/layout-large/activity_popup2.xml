@@ -24,7 +24,7 @@
                         android:id="@+id/core"
                         android:layout_above="@+id/bottom_wrap"
                         android:layout_width="match_parent"
-                        android:layout_height="125dp"
+                        android:layout_height="265dp"
                         android:orientation="vertical"
                         android:gravity="bottom" >
                             
@@ -184,7 +184,7 @@
                   <LinearLayout
                         android:id="@+id/bottom_wrap"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
+                        android:layout_height="240dp"
                         android:animateLayoutChanges="true"
                         android:orientation="vertical" 
                         android:background="@color/popup_background"
@@ -262,6 +262,7 @@
                         android:orientation="vertical"
                         android:gravity="center"
                       >
+			    		
 			    		 <LinearLayout 
 			    		    android:id="@+id/middle_expandable"
 	                        android:layout_width="match_parent"
@@ -270,6 +271,17 @@
 	                        android:gravity="center"
 	                        android:visibility="gone"
                     	  >
+                            <ToggleButton
+					            android:id="@+id/dropmain"
+					            android:layout_width="40dp"
+					            android:layout_height="40dp"
+					            android:textOff=""
+					            android:textOn=""
+					            android:textColor="#4F7FDF"
+					            android:background="@drawable/toggle_selector3"
+					            android:layout_marginRight="20dp"
+					            />
+                             <!-- 中间-->
                             <ToggleButton
 					            android:id="@+id/mt1"
 					            android:layout_width="40dp"
@@ -290,6 +302,18 @@
 					            android:layout_marginLeft="45dp"
 					            />
                             <!-- 中间-->
+                            
+                            <ToggleButton
+					            android:id="@+id/autosearch"
+					            android:layout_width="40dp"
+					            android:layout_height="40dp"
+					            android:textOff=""
+					            android:textOn=""
+					            android:textColor="#4F7FDF"
+					            android:background="@drawable/toggle_selector4"
+					            android:layout_marginLeft="25dp"
+					            android:visibility="invisible"
+					            />
                             
                            </LinearLayout>
 			    		    
@@ -362,22 +386,27 @@
 </LinearLayout>
     
     
-<LinearLayout
+<FrameLayout
     android:id="@+id/dialogHolder"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 	android:visibility="gone"
 	android:orientation="vertical"
 	android:gravity="center"
+	android:background="#8a303050"
     >
+		<ImageView 
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+			android:src="@drawable/galaxy"/>
 		<LinearLayout
-		    android:layout_centerInParent="true"
+		     android:layout_gravity="center"
 			android:id="@+id/dialog_"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
 			android:background="@drawable/popup_background3"
 			/>
-</LinearLayout>	
+</FrameLayout>	
 		
 </RelativeLayout>

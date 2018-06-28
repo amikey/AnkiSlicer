@@ -68,5 +68,9 @@
         <item name="android:colorBackground">@color/colorPrimary</item>
     </style>
     
-    
+           <style name="ToolBarTheme2" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColorPrimary">#ffffff</item>
+        <item name="android:textColorSecondary">@color/colorPrimary</item>
+        <item name="android:colorBackground">@color/colorPrimary</item>
+    </style> 
 </resources>

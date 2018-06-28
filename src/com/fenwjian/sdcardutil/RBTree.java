@@ -99,8 +99,8 @@ public class RBTree<T extends Comparable<? super T>> {
         mInOrderDo = ido;
     }
     //![2]接口
-    public interface inOrderDo{
-        void dothis(RBTNode node);
+    public interface inOrderDo<T extends Comparable<? super T>>{
+        void dothis(RBTNode<T> node);
     }
     private inOrderDo mInOrderDo;
     //![3]中序递归

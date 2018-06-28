@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:descendantFocusability="beforeDescendants"
+    >
+    
+	    <View 
+	        android:id="@+id/shelfright"
+		    android:layout_width="1dp"  
+		    android:layout_height="match_parent"  
+		    android:layout_toRightOf="@+id/sideBar"
+		    android:background="#707070"
+	        />
+    
+    
+            <android.support.v7.widget.RecyclerView
+		 	android:id="@+id/main_list"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:background="#00ff0000" 
+	        android:layout_toRightOf="@+id/sideBar"
+        />
+       	    
+      <com.knziha.ankislicer.customviews.VerticalRecyclerViewFastScrollermy
+	      android:id="@+id/fast_scroller"
+	      android:layout_width="35dp"
+	      android:layout_height="match_parent"
+	      android:layout_alignParentRight="true"
+      >
+      
+      </com.knziha.ankislicer.customviews.VerticalRecyclerViewFastScrollermy>
+    <include layout="@layout/anki_progress"/>
+    
+    
+    
+
+
+
+
+
+    <android.support.v7.widget.Toolbar
+	        android:id="@+id/toolbar"
+	        android:layout_width="match_parent"
+	        android:layout_height="40dp"
+	        android:minHeight="40dp"
+	        android:theme="@style/ToolBarTheme"
+	        android:background="#a0a0a0ae"
+	        android:visibility="gone"
+	         />
+    
+    
+    		<com.knziha.ankislicer.customviews.ShelfLinearLayout
+				    android:id="@+id/sideBar"
+				    android:layout_width="60dp"  
+				    android:layout_height="match_parent"  
+				    android:orientation="vertical"
+				    android:showDividers="middle"
+				    android:divider="@drawable/divider"
+				     >
+				     
+    		    
+    		    <ImageView
+				         android:id="@+id/tools0"
+					     android:layout_width="match_parent"  
+					     android:layout_height="60dp" 
+					     android:background="@drawable/ic_pan_tool_black_24dp"
+					     android:clickable="true"
+					     android:padding="5dp"
+				         />
+    		    <ImageView
+				         android:id="@+id/tools1"
+					     android:layout_width="match_parent"  
+					     android:layout_height="60dp" 
+					     android:background="@drawable/select"
+					     android:clickable="true"
+					     android:padding="5dp"
+				         />
+    		    <ImageView
+				         android:id="@+id/tools2"
+					     android:layout_width="match_parent"  
+					     android:layout_height="60dp" 
+					     android:background="@drawable/previewc"
+					     android:clickable="true"
+					     android:padding="5dp"
+				         />
+    		    
+    		    <ImageView
+				         android:id="@+id/tools3"
+					     android:layout_width="match_parent"  
+					     android:layout_height="60dp" 
+					     android:background="@drawable/delete"
+					     android:clickable="true"
+					     android:padding="5dp"
+				         />
+				     
+				     <ImageView
+				         android:id="@+id/choosed"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp" 
+					    android:background="@drawable/choosed"
+					    android:clickable="true"
+				         />
+	    		    <ImageView
+					         android:id="@+id/changed"
+						    android:layout_width="match_parent"  
+						    android:layout_height="60dp" 
+						    android:background="@drawable/movec"
+						    android:clickable="true"
+					         />
+	    		    <FrameLayout
+						    android:layout_width="match_parent"  
+						    android:layout_height="60dp"  
+	    		        >
+		    		     <ImageView
+						         android:id="@+id/bookmark0"
+							    android:layout_width="match_parent"  
+							    android:layout_height="0dp" 
+							    android:clickable="true"
+						         />
+		    		     <ImageView
+						         android:id="@+id/bookmark"
+							    android:layout_width="match_parent"  
+							    android:layout_height="60dp" 
+							    android:background="@drawable/bookmark"
+							    android:clickable="true"
+						         />
+	    		    </FrameLayout>
+    		    <ImageView
+				        android:id="@+id/side2"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp" 
+					    android:background="#ffff00"
+					    android:clickable="true"
+					    android:visibility="gone"
+				         />
+    		    
+    		    
+    		    
+   				     <ImageView
+				         android:id="@+id/search"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp" 
+					    android:background="@drawable/ic_search"
+					    android:backgroundTint="#000000"
+					    android:clickable="true"
+				         />
+   				     
+    		    
+    		    <ToggleButton 
+    		        	android:id="@+id/tg1"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp"
+					    android:textOn="Ø"
+					    android:textOff=""
+					    android:textColor="#ffaaaa"
+					    android:textSize="25sp"
+					    android:gravity="center"
+					    android:background="@drawable/hori"
+					    android:visibility="gone"
+					    />
+    		    
+    		    <ToggleButton 
+    		        	android:id="@+id/tg2"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp"
+					    android:textOn="Ø"
+					    android:textOff=""
+					    android:textColor="#ffaaaa"
+					    android:textSize="25sp"
+					    android:gravity="center"
+					    android:background="@drawable/ver"
+    		        />
+    		    
+    		    </com.knziha.ankislicer.customviews.ShelfLinearLayout>
+    		    
+    		<LinearLayout
+				    android:id="@+id/sideBar2"
+				    android:layout_width="60dp"  
+				    android:layout_height="match_parent"  
+				    android:orientation="vertical"
+				    android:showDividers="middle"
+				    android:divider="@drawable/divider"
+				    android:gravity="bottom"
+				     >
+   				<ImageView
+				         android:id="@+id/lst"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp" 
+					    android:background="@drawable/ic_arrow_back_black_24dp"
+					    android:backgroundTint="#000000"
+					    android:clickable="true"
+				         />
+    		    <ImageView
+				         android:id="@+id/nxt"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp" 
+					    android:background="@drawable/ic_arrow_forward_black_24dp"
+					    android:backgroundTint="#000000"
+					    android:clickable="true"
+				         />
+    		    <ScrollView 
+    		        	android:id="@+id/counterHolder"
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp" >
+    		    <TextView
+					    android:layout_width="match_parent"  
+					    android:layout_height="60dp" 
+				        android:id="@+id/counter"
+					    android:clickable="true"
+					    android:text="0:\n100"
+					    android:textColor="#000000"
+				         />
+    		    </ScrollView>
+    		</LinearLayout>
+    		
+
+    
+        
+    
+<FrameLayout         
+    	android:id="@+id/listHolder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        >
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:background="@color/whitehalf"
+        android:layout_marginLeft="60dp"
+        />
+</FrameLayout>
+    
+
+    
+</RelativeLayout>

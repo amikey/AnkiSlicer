@@ -16,6 +16,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -88,8 +89,10 @@ public class TextViewmy extends android.support.v7.widget.AppCompatTextView {
 			MethodgetSelectionCon=mEditorClass.getDeclaredMethod("getSelectionController");
 			MethodgetSelectionCon.setAccessible(true);
 			
-            MethodStartAMMenu=mEditorClass.getDeclaredMethod("startSelectionActionMode");
-            MethodStartAMMenu.setAccessible(true);
+			if(Build.VERSION.SDK_INT<=24) {//ehlol androdi and fcku u!!!
+	            MethodStartAMMenu=mEditorClass.getDeclaredMethod("startSelectionActionMode");
+	            MethodStartAMMenu.setAccessible(true);
+			}
             
             if(Build.VERSION.SDK_INT>=24) {
 	            MethodStartAMMenu2=mEditorClass.getDeclaredMethod("startSelectionActionModeInternal");
@@ -135,6 +138,8 @@ public class TextViewmy extends android.support.v7.widget.AppCompatTextView {
     @Override
     protected void onSelectionChanged(int selStart_, int selEnd_) {
         super.onSelectionChanged(selStart_,selEnd_);
+        if(ListenNotSelectionChange)
+        	return;
         if(SChanged!=null)//(selEnd_!=selEnd||selStart_!=selStart) && 
         	SChanged.onSelectionChanged(selStart_,selEnd_);
         if(selEnd_!=selStart_) {
@@ -150,7 +155,7 @@ public class TextViewmy extends android.support.v7.widget.AppCompatTextView {
         Selection.setSelection((Spannable) this.getText(), selStart, selEnd);
         ShowTvSelecionHandle();
         this.setSelected(true);
-        this.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP,0,0, 0));
+        this.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP,xmy,ymy, 0));
         sHided=false;
 
     }
@@ -159,24 +164,17 @@ public class TextViewmy extends android.support.v7.widget.AppCompatTextView {
         try {
         	//Toast.makeText(getContext(), System.currentTimeMillis()+":"+"ShowTvSelecionHandle", Toast.LENGTH_LONG).show();
     		sdkVersionCode = Build.VERSION.SDK_INT;
-
-            if(ObjectSelectionC==null){
-    			ObjectSelectionC=MethodgetSelectionCon.invoke(ObjectEditor);
-				//Toast.makeText(CMN.a, "ObjectSelectionC is null:"+(ObjectSelectionC==null), Toast.LENGTH_LONG).show();
-    	        MethodShow=ObjectSelectionC.getClass().getMethod("show");
-    	        MethodShow.setAccessible(true);
-    	        if(sdkVersionCode>=24){
-	    	        MethodEnterDrag=ObjectSelectionC.getClass().getMethod("enterDrag",new Class[]{int.class});
-	                MethodEnterDrag.setAccessible(true);
-    	        }
-            }
+    		
+    		LoadObjectSelectionC();
 
             if( sdkVersionCode>=24) {
                 //my reflection
                 MethodEnterDrag.invoke(ObjectSelectionC,new Object[] {2});
                 //弹出 ActionMode Menu
                 //if(!Main_lyric_Fragment.isDraggingEffecting){
-            	boolean asd = (boolean)MethodStartAMMenu.invoke(ObjectEditor);
+                if(sdkVersionCode==24)
+	            	//boolean asd = (boolean)
+	            	MethodStartAMMenu.invoke(ObjectEditor);
                 //}
                 //忽略下一次 ActionUp
                 //Field mSelectionActionMode = Class.forName("android.widget.Editor").getDeclaredField("mDiscardNextActionUp");
@@ -191,11 +189,41 @@ public class TextViewmy extends android.support.v7.widget.AppCompatTextView {
             sHided=false;
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(getContext().getApplicationContext(),"ShowTvSelecionHandle:failed  "+e.getMessage()+" "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext().getApplicationContext(),"ShowTvSelecionHandle:failed  "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
         }
     }
     
-    public void hideTvSelecionHandle(){
+    public void EnterDrag(){
+        try {
+    		sdkVersionCode = Build.VERSION.SDK_INT;
+    		
+    		LoadObjectSelectionC();
+    		MethodShow.invoke(ObjectSelectionC);
+            MethodEnterDrag.invoke(ObjectSelectionC,new Object[] {2});
+            MethodShow.invoke(ObjectSelectionC);
+
+            sHided=false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext().getApplicationContext(),"ShowTvSelecionHandle:failed  "+e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    
+    
+    private void LoadObjectSelectionC() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        if(ObjectSelectionC==null){
+			ObjectSelectionC=MethodgetSelectionCon.invoke(ObjectEditor);
+			//Toast.makeText(CMN.a, "ObjectSelectionC is null:"+(ObjectSelectionC==null), Toast.LENGTH_LONG).show();
+	        MethodShow=ObjectSelectionC.getClass().getMethod("show");
+	        MethodShow.setAccessible(true);
+	        if(sdkVersionCode>=24){
+    	        MethodEnterDrag=ObjectSelectionC.getClass().getMethod("enterDrag",new Class[]{int.class});
+                MethodEnterDrag.setAccessible(true);
+	        }
+        }		
+	}
+	public void hideTvSelecionHandle(){
         try {
             Field mEditor = TextView.class.getDeclaredField("mEditor");
             mEditor.setAccessible(true);
@@ -282,6 +310,38 @@ public class TextViewmy extends android.support.v7.widget.AppCompatTextView {
         		canvas.drawRoundRect(b,8,8,p3);
 
 	}
+
+	//below method saves a 内训 from 布拉斯提得 by 努克利尔 weapon.
+	public void setTextKeepNation(SpannableStringBuilder baseSpan) {
+		setTextKeepState(baseSpan);
+
+		
+		//if(Build.VERSION.SDK_INT==24)
+		if(hasSelection()) {//需要恢复选择
+			final int st = getSelectionStart();
+			final int ed = getSelectionEnd();
+			post(new Runnable() {
+				@Override
+				public void run() {
+					ShowTvSelecionHandle();
+					if(Build.VERSION.SDK_INT>=24) {
+						if(Build.VERSION.SDK_INT>=25) {
+							ListenNotSelectionChange = true;
+						}
+						onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP,xmy,ymy, 0));
+					}
+					if(Build.VERSION.SDK_INT>=25)
+					postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							setSelection(st, ed);
+							ListenNotSelectionChange = false;
+						}
+						}, 200);
+				}});
+		}
+	}
 	
+	public boolean ListenNotSelectionChange=false;
 	
 }
